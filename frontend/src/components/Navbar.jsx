@@ -41,7 +41,7 @@ const Navbar = () => {
                 <p onClick={() => setToken(false)} className='hover:text-black cursor-pointer'>Logout</p>
               </div>
             </div>
-          </div>
+          </div> 
         ) : (
           <button
             onClick={() => navigate("/login")}
