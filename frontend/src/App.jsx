@@ -13,8 +13,8 @@ import Navbar from './components/Navbar.jsx';
 const App = () => {
   return (
     <div className="mx=4 sm:mx-[10%]">
-
-      <Navbar />
+      
+      <Navbar /> {/* Navbar visible in all the pages */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/doctors" element={<Doctors />} />
