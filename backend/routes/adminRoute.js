@@ -1,12 +1,10 @@
 import express from 'express';
-import upload from '../middleware/multer.js';
-import authAdmin from '../middleware/authAdmin.js'; 
+import upload from '../middlewares/multer.js';
+// import authAdmin from '../middlewares/authAdmin.js'; 
 import { addDoctor } from '../controllers/adminController.js';
-
 
 const adminRouter = express.Router();
 
-adminRouter.post("/add-doctor", authAdmin, upload.single('image'), addDoctor)
-
+adminRouter.post('/add-doctor',upload.single('image'), addDoctor);
 
 export default adminRouter;

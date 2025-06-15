@@ -21,9 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // API endpoints
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+
 app.use("/api/admin",adminRouter)
 
 // Start server
