@@ -1,12 +1,8 @@
 
-
-
-
-
-
-
-
-
+import doctorModel from "../models/doctorModel.js";
+import bcrypt from "bcrypt";
+import validator from "validator";
+import { v2 as cloudinary } from "cloudinary";
 
 
 // API for adding Doctor
@@ -32,7 +28,7 @@ const addDoctor = async (req, res) => {
             return res.json({ success: false, message: "Please enter a strong password" })
         }
 
-        // hashing user password
+        // hashing doctor password
         const salt = await bcrypt.genSalt(10); // the more no. round the more time it will take
         const hashedPassword = await bcrypt.hash(password, salt)
 
