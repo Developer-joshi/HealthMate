@@ -7,6 +7,7 @@ import multer from "multer";
 // import cloudinary from "cloudinary";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import adminRouter from "./routes/adminRoute.js";
 
 // App config
 const app = express();
@@ -23,6 +24,7 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+app.use("/api/admin",adminRouter)
 
 // Start server
 app.listen(port, () => {
