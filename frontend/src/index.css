@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 *{
-  font-family:outfit;
+  font-family:Outfit;
 }
 .active hr {
   @apply block;
