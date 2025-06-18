@@ -33,7 +33,7 @@ const Doctors = () => {
           className={`py-1 px-3 border rounded text-sm  transition-all sm:hidden ${
             showFilter ? "bg-primary text-white" : ""
           }`}
-          onClick={() => setShowFilter((prev) => !prev)}
+          onClick={() => setShowFilter(!showFilter)}
         >
           Filters
         </button>
