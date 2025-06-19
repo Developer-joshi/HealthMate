@@ -12,11 +12,39 @@ const Navbar = () => {
       <img onClick={() => navigate('/')} className="w-44 cursor-pointer" src={assets.logo} alt="logo" />
       
       <ul className="hidden md:flex items-start gap-5 font-medium">
-        <NavLink onClick={() => SetShowMenu(false)} to="/"><li className="py-1">HOME</li></NavLink>
-        <NavLink onClick={() => SetShowMenu(false)} to="/doctors"><li className="py-1">ALL DOCTORS</li></NavLink>
-        <NavLink onClick={() => SetShowMenu(false)} to="/about"><li className="py-1">ABOUT</li></NavLink>
-        <NavLink onClick={() => SetShowMenu(false)} to="/contact"><li className="py-1">CONTACT</li></NavLink>
-      </ul>
+  <NavLink 
+    onClick={() => SetShowMenu(false)} 
+    to="/" 
+    className={({ isActive }) => isActive ? "py-1 border-b-2 border-gray-500" : "py-1"}
+  >
+    HOME
+  </NavLink>
+  
+  <NavLink 
+    onClick={() => SetShowMenu(false)} 
+    to="/doctors" 
+    className={({ isActive }) => isActive ? "py-1 border-b-2 border-gray-500" : "py-1"}
+  >
+    ALL DOCTORS
+  </NavLink>
+  
+  <NavLink 
+    onClick={() => SetShowMenu(false)} 
+    to="/about" 
+    className={({ isActive }) => isActive ? "py-1 border-b-2 border-gray-500" : "py-1"}
+  >
+    ABOUT
+  </NavLink>
+  
+  <NavLink 
+    onClick={() => SetShowMenu(false)} 
+    to="/contact" 
+    className={({ isActive }) => isActive ? "py-1 border-b-2 border-gray-500" : "py-1"}
+  >
+    CONTACT
+  </NavLink>
+</ul>
+
 
       <div className="flex items-center gap-4">
         {token ? (
