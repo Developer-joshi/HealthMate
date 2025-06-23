@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import adminRouter from "./routes/adminRoute.js";
 import doctorRouter from "./routes/doctorRoute.js";
+import userRouter from "./routes/userRoute.js";
 
 // App config
 const app = express();
@@ -25,6 +26,7 @@ app.use(cors());
 
 app.use("/api/admin",adminRouter)
 app.use("/api/doctor",doctorRouter)
+app.use('/api/user',userRouter)
 
 // Start server
 app.listen(port, () => {
