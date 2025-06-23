@@ -8,6 +8,7 @@ import multer from "multer";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import adminRouter from "./routes/adminRoute.js";
+import doctorRouter from "./routes/doctorRoute.js";
 
 // App config
 const app = express();
@@ -23,6 +24,7 @@ app.use(cors());
 // API endpoints
 
 app.use("/api/admin",adminRouter)
+app.use("/api/doctor",doctorRouter)
 
 // Start server
 app.listen(port, () => {
