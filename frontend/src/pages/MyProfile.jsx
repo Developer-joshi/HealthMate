@@ -1,23 +1,18 @@
 import React, { useState } from "react";
-import { assets } from "../assets/assets";
+import { AppContext } from "../context/AppContext";
+
 
 const MyProfile = () => {
   const [isEdit, setIsEdit] = useState(false);
 //if we have to edit the data
-  const [userData, setUserData] = useState({
-    name: "Richard James",
-    image: assets.profile_pic,
-    email: "richardjames@gmail.com",
-    phone: "+1  123 456 7890",
-    address: {
-      line1: "57th Cross, Richmond",
-      line2: "Circle, Church Road, London",
-    },
-    gender: "Male",
-    dob: "2000-01-20",
-  });
+//data from state variable in context
+  const [image, setImage] = useState(false)
 
-  return (
+  const { token, backendUrl, userData, setUserData, loadUserProfileData } = useContext(AppContext)
+  const updateUserProfileData = async () => {
+    
+  }
+  return userData &&(
     <div className="max-w-lg flex flex-col gap-2 text-sm">
       <img className="w-36 rounded" src={userData.image} alt="" />
 
