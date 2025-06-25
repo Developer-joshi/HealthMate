@@ -12,6 +12,7 @@
       const dateArray = slotDate.split('_')
       return dateArray[0]+ " " + months[Number(dateArray[1])+ " "+dateArray[2]]
     }
+    // function to setAppointment
     const getUserAppointments = async()=>{
       try{
         const{data}=await axios.get(backendUrl+'/api/user/appointments',{headers:{token}})
@@ -24,6 +25,26 @@
         toast.error(error.message)
       }
     }
+    // function to cancel appointment
+    const cancelAppointment = async (appointmentId) => {
+
+      try {
+
+          const { data } = await axios.post(backendUrl + '/api/user/cancel-appointment', { appointmentId }, { headers: { token } })
+
+          if (data.success) {
+              toast.success(data.message)
+              getUserAppointments()
+          } else {
+              toast.error(data.message)
+          }
+
+      } catch (error) {
+          console.log(error)
+          toast.error(error.message)
+      }
+
+  }
     useEffect(()=>{
       if(token){
         getUserAppointments()
@@ -73,12 +94,13 @@
 
             
               <div className="flex flex-col justify-end gap-2">
-                <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300ms">
+                {!item.cancelled && <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300ms">
                   Pay Online
-                </button>
-                <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300ms">
+                </button>}
+                {!item.cancelled&& <button onClick={()=>cancelAppointment(item._id)} className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300ms">
                   Cancel appointment
-                </button>
+                </button>}
+                {item.cancelled && <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500'>Appointment Cancelled</button>}
               </div>
             </div>
           ))}
