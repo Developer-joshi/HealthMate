@@ -4,8 +4,14 @@
   const MyAppointments = () => {
     const { backendUrl, token } = useContext(AppContext)
       
-    const[appointments,setAppointments]=useContext([])
+    const[appointments,setAppointments]=useState([])
 
+    const months = [" ","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+     
+    const slotDateFormat =(slotDate)=>{
+      const dateArray = slotDate.split('_')
+      return dateArray[0]+ " " + months[Number(dateArray[1])+ " "+dateArray[2]]
+    }
     const getUserAppointments = async()=>{
       try{
         const{data}=await axios.get(backendUrl+'/api/user/appointments',{headers:{token}})
@@ -30,7 +36,7 @@
         </p>
 
         <div className="space-y-4 mt-4">
-          {doctors.slice(0, 4).map((item, index) => (
+          {appointments.slice(0, 4).map((item, index) => (
             <div
               key={index}
               className="
@@ -61,7 +67,7 @@
                 <p className="text-xs mt-1">
                   <span className="text-sm text-neutral-700 font-medium">
                     Date &amp; Time:
-                  </span>{item.slotDate}|{item.slotTime}
+                  </span>{slotDateFormat(item.slotDate)}|{item.slotTime}
                 </p>
               </div>
 
