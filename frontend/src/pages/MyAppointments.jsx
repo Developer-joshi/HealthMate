@@ -1,12 +1,15 @@
-  import React, { useContext } from 'react'
+  import React, { useContext,useEffect,useState } from 'react'
   import { AppContext } from "../context/AppContext"
   import { useNavigate } from 'react-router-dom'
+  import axios from 'axios'
+  import { toast } from 'react-toastify'
+import { assets } from '../assets/assets'
 
 
   const MyAppointments = () => {
     const { backendUrl, token } = useContext(AppContext)
     const navigate = useNavigate()
-      
+      const [payment, setPayment] = useState('')
     const[appointments,setAppointments]=useState([])
 
     const months = [" ","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
