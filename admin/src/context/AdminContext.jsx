@@ -1,6 +1,7 @@
 import { createContext, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { get } from "mongoose";
 
 export const AdminContext = createContext()
 
@@ -83,8 +84,26 @@ const AdminContextProvider = (props) =>{
             console.log(error)
         }
     }
+
+    const getDashData = async () => {
+        try {
+            const { data } = await axios.get(backendUrl + '/api/admin/dashboard', { headers: { aToken } })
+            if (data.success) {
+                setDashData(data.dashData)
+                
+            } 
+            else {
+                toast.error(data.message)
+            }
+        } 
+        catch (error) {
+            toast.error(error.message)
+            console.log(error)
+        }
+    }
     const value = {
-        aToken,setAToken,backendUrl,doctors,getAllDoctors,changeAvailability,getAllAppointments,appointments,setAppointments,cancelAppointment
+        aToken,setAToken,backendUrl,doctors,getAllDoctors,changeAvailability,getAllAppointments,appointments,setAppointments,cancelAppointmen,
+        dashData,getDashData
     }
 
      
