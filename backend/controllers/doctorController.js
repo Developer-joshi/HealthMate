@@ -27,6 +27,21 @@ const loginDoctor = async (req, res) => {
   }
 };
 
+// API to get doctor appointments for doctor panel
+const appointmentsDoctor = async (req, res) => {
+    try {
+
+        const { docId } = req.body
+        const appointments = await appointmentModel.find({ docId })
+
+        res.json({ success: true, appointments })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
 const changeAvailablity = async (req, res) => {
   try {
     const { docId } = req.body;
@@ -52,4 +67,4 @@ const doctorList = async (req, res) => {
   }
 };
 
-export { changeAvailablity, doctorList ,loginDoctor};
+export { changeAvailablity, doctorList ,loginDoctor,appointmentsDoctor};
