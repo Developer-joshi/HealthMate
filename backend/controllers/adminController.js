@@ -109,21 +109,46 @@ const appointmentsAdmin = async (req, res) => {
 
 }
 
-// API for appointment cancellation
+// API to cancel appointment
 const appointmentCancel = async (req, res) => {
-    try {
-
-        const { appointmentId } = req.body
-        await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
-
-        res.json({ success: true, message: 'Appointment Cancelled' })
-
-    } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+  try {
+    const { appointmentId } = req.body;
+    const appointmentData = await appointmentModel.findById(appointmentId);
+    if (!appointmentData) {
+      return res.json({ success: false, message: "Appointment not found" });
     }
 
-}
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      cancelled: true,
+    });
+
+    const { docTd, slotDate, slotTime } = appointmentData;
+    const doctorData = await doctorModel.findById(docTd);
+    if (
+      !doctorData ||
+      !doctorData.slots_booked ||
+      !doctorData.slots_booked[slotDate]
+    ) {
+      return res.json({
+        success: false,
+        message: "Doctor data or slot not found",
+      });
+    }
+
+    doctorData.slots_booked[slotDate] = doctorData.slots_booked[
+      slotDate
+    ].filter((e) => e !== slotTime);
+    await doctorModel.findByIdAndUpdate(docTd, {
+      slots_booked: doctorData.slots_booked,
+    });
+
+    res.json({ success: true, message: "Appointment Cancelled" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 
 //api to get dashboard data for admin panel
 const adminDashboard = async (req, res) => {
