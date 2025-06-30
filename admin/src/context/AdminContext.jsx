@@ -1,7 +1,6 @@
 import { createContext, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { get } from "mongoose"; 
 
 export const AdminContext = createContext()
 
