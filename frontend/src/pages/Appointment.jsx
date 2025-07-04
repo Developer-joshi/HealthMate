@@ -16,12 +16,11 @@ const Appointment = () => {
   const navigate = useNavigate();
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
-  const [slotTime, setSlotTime] = useState("");
+  const [slotTime, setSlotTime] = useState('');
 
   const fetchDocInfo = async () => {
     const docInfo = doctors.find((doc) => doc._id === docId);
     setDocInfo(docInfo);
-    console.log(docInfo);
   };
 
   const getAvailableSlots = async () => {

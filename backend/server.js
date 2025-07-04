@@ -28,6 +28,15 @@ app.use("/api/admin",adminRouter)
 app.use("/api/doctor",doctorRouter)
 app.use('/api/user',userRouter)
 
+// Error handler (place after routes)
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err.stack);
+  res.status(500).json({ success: false, message: 'Server Error', error: err.message });
+});
+app.get("/", (req, res) => {
+  res.send("HealthMate backend is running!");
+});
+
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
