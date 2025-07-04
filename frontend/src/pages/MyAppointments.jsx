@@ -118,8 +118,7 @@ import { assets } from '../assets/assets'
                 py-2 
                 border-b
               "
-            >
-            
+            >      
               <img
                 className="w-32 bg-indigo-50"
                 src={item.docData.image}

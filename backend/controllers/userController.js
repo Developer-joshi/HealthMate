@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import {v2 as cloudinary} from 'cloudinary'
 import doctorModel from '../models/doctorModel.js';
 import razorpay from 'razorpay'
+import appointmentModel from '../models/appointmentModel.js';
+
 
 const razorpayInstance = new razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -50,7 +52,7 @@ const registerUser = async (req,res)=>{
 
     } catch (error) {
         console.log(error)
-        res.json({success:false,messagr:error.message})
+        res.json({success:false,message:error.message})
     }
 }
 
@@ -77,7 +79,7 @@ const loginUser = async(req,res)=>{
         
     } catch (error) {
         console.log(error)
-        res.json({success:false,messagr:error.message})
+        res.json({success:false,message:error.message})
     }
 }
 
@@ -85,7 +87,8 @@ const loginUser = async(req,res)=>{
 const getProfile = async (req,res)=>{
     try {
         
-        const { userId } = req.body;
+        // const { userId } = req.body;
+        const userId = req.userId;
         const userData = await userModel.findById(userId).select('-password')
 
         res.json({success:true,userData});
@@ -99,7 +102,9 @@ const getProfile = async (req,res)=>{
 //API to update user profile
 const updateProfile = async(req,res)=>{
     try {
-        const {userId,name,phone,address,dob,gender} = req.body
+        // const {userId,name,phone,address,dob,gender} = req.body
+        const userId = req.userId;
+        const { name, phone, address, dob, gender } = req.body;
         const imageFile=req.file;
 
         if(!name || !phone || !dob || !gender)
@@ -129,7 +134,9 @@ const bookAppointment = async (req, res) => {
 
     try {
 
-        const { userId, docId, slotDate, slotTime } = req.body
+        // const { userId, docId, slotDate, slotTime } = req.body
+        const userId = req.userId;
+        const { docId, slotDate, slotTime } = req.body;
         const docData = await doctorModel.findById(docId).select("-password")
 
         if (!docData.available) {
@@ -184,7 +191,8 @@ const bookAppointment = async (req, res) => {
 const listAppointment = async (req, res) => {
     try {
 
-        const { userId } = req.body
+        // const { userId } = req.body
+        const userId = req.userId;
         const appointments = await appointmentModel.find({ userId })
 
         res.json({ success: true, appointments })
@@ -198,11 +206,14 @@ const listAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
     try {
 
-        const { userId, appointmentId } = req.body
+        // const { userId, appointmentId } = req.body
+        const userId = req.userId;
+        const { appointmentId } = req.body;
         const appointmentData = await appointmentModel.findById(appointmentId)
 
         // verify appointment user 
-        if (appointmentData.userId !== userId) {
+        if (appointmentData.userId.toString() !== userId)
+         {
             return res.json({ success: false, message: 'Unauthorized action' })
         }
 
