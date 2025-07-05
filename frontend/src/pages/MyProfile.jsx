@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState ,useContext} from "react";
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const MyProfile = () => {
   const [isEdit, setIsEdit] = useState(false);
@@ -54,7 +55,7 @@ const MyProfile = () => {
           : <img className='w-36 rounded' src={userData.image} alt="" />
       }
 
-      <img className="w-36 rounded" src={userData.image} alt="" />
+      {/* <img className="w-36 rounded" src={userData.image} alt="" /> */}
 
       {isEdit ? (
         <input
