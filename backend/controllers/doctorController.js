@@ -113,7 +113,7 @@ const appointmentCancel = async (req,res)=>{
 //API TO GET DASHBOARD DATA FOR DOCTOR PANEL
 const doctorDashboard = async(req,res)=>{
   try {
-    const {doctId} = req.body;
+    const {docId} = req.body;
     
     const appointments = await appointmentModel.find({docId});
 
@@ -166,8 +166,8 @@ const doctorProfile =async(req,res)=>{
 //API to update doctor profile data from doctor panel
 const updateDoctorProfile = async(req,res)=>{
   try {
-    const {docId , fee, address, available} = req.body;
-    await doctorModel.findByIdAndUpdate(docId,{fee,address,available});
+    const {docId , fees, address, available} = req.body;
+    await doctorModel.findByIdAndUpdate(docId,{fees,address,available});
     res.json({success:true,message:'Profile Updated'});
 
   } catch (error) {

@@ -19,7 +19,7 @@ const Login = () => {
 //whenevr form submits it does not reload
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    
+    //call reg and login api from backend
     try {
       if(state === 'Sign Up')
       {
