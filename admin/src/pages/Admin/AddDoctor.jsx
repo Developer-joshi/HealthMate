@@ -19,8 +19,8 @@ const AddDoctor = () => {
     const [address1, setAddress1] = useState('')
     const [address2, setAddress2] = useState('')
 
-    const { backendUrl } = useContext(AppContext)
-    const { aToken } = useContext(AdminContext)
+    // const { backendUrl } = useContext(AppContext)
+    const { aToken ,backendUrl } = useContext(AdminContext)
 
     const onSubmitHandler = async (event) => {
         event.preventDefault()

@@ -19,7 +19,7 @@ const AppContextProvider = (props) =>{
         return age
     }
 
-    const currency='$';
+    const currency='₹';
 
     const value = {
       calculateAge,
