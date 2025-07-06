@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { DoctorContext } from '../../context/DoctorContext';
 
 const DoctorProfile = () => {
 

@@ -8,10 +8,12 @@ import authDoctor from '../middlewares/authDoctor.js';
  doctorRouter.get('/list',doctorList)
 
  doctorRouter.post('/login',loginDoctor)
- doctorRouter.get('/appoinments',authDoctor,appointmentsDoctor)
+ doctorRouter.post('/appointments',authDoctor,appointmentsDoctor)
  doctorRouter.post('/complete-appointment',authDoctor,appointmentCancel);
  doctorRouter.get('/cancel-appointment',authDoctor,appointmentComplete);
- doctorRouter.get('/dashboard',authDoctor,doctorDashboard)
- doctorRouter.get('/profile',authDoctor,doctorProfile);
+//  doctorRouter.get('/dashboard',authDoctor,doctorDashboard)
+ doctorRouter.post("/dashboard", authDoctor, doctorDashboard);
+
+ doctorRouter.post('/profile',authDoctor,doctorProfile);
  doctorRouter.post('/update-profile',authDoctor,updateDoctorProfile);
  export default doctorRouter

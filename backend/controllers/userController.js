@@ -10,7 +10,7 @@ import appointmentModel from '../models/appointmentModel.js';
 
 const razorpayInstance = new razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
 })
 
 //API to register the user
@@ -251,10 +251,12 @@ const paymentRazorpay = async (req, res) => {
 
         // creating options for razorpay payment
         const options = {
-            amount: appointmentData.amount * 100,
-            currency: process.env.CURRENCY,
-            receipt: appointmentId,
-        }
+          // amount: appointmentData.amount * 100,
+          amount: Number(appointmentData.amount) * 100,
+          currency: process.env.CURRENCY,
+          receipt: appointmentId,
+          payment_capture: 1
+        };
 
         // creation of an order
         const order = await razorpayInstance.orders.create(options)

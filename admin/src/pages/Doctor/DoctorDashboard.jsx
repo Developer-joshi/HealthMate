@@ -55,7 +55,7 @@ const DoctorDashboard = () => {
                 </div>
       
                 <div className="pt-4 border border-t-0">
-                  {dashData.latestAppointments.slice(0, 5).map((item, index) => (
+                  {dashData.latestAppointment.slice(0, 5).map((item, index) => (
                     <div
                       className="flex items-center px-6 py-3 gap-3 hover:bg-gray-100"
                       key={index}

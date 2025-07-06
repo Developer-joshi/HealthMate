@@ -42,7 +42,7 @@ const appointmentsDoctor = async (req, res) => {
     }
 }
 
-const changeAvailablity = async (req, res) => {
+const changeAvailability = async (req, res) => {
   try {
     const { docId } = req.body;
 
@@ -50,7 +50,7 @@ const changeAvailablity = async (req, res) => {
     await doctorModel.findByIdAndUpdate(docId, {
       available: !docData.available,
     });
-    res.json({ success: true, message: "Availablity Changed" });
+    res.json({ success: true, message: "Availability Changed" });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -119,7 +119,7 @@ const doctorDashboard = async(req,res)=>{
 
     let earnings = 0;
     appointments.map((item)=>{
-      if(item.isCompleted || item.payment)
+      if(item.isCompleted && item.payment)
       {
         earnings+=item.amount;
       }
@@ -137,10 +137,10 @@ const doctorDashboard = async(req,res)=>{
 
     const dashData = {
       earnings,
-      appointments : appointments.length,
-      patients : patients.length,
-      latestAppointment : appointments.reverse().slice(0,5)
-    }
+      appointments: appointments.length,
+      patients: patients.length,
+      latestAppointment: [...appointments].reverse().slice(0, 5),
+    };
 
     res.json({success:true,dashData});
 
@@ -175,10 +175,14 @@ const updateDoctorProfile = async(req,res)=>{
     res.json({ success: false, message: error.message });
   }
 }
-export { 
-  changeAvailablity, doctorList ,
-  loginDoctor,appointmentsDoctor,
-  appointmentCancel,appointmentComplete,
+export {
+  changeAvailability,
+  doctorList,
+  loginDoctor,
+  appointmentsDoctor,
+  appointmentCancel,
+  appointmentComplete,
   doctorDashboard,
-  doctorProfile,updateDoctorProfile
+  doctorProfile,
+  updateDoctorProfile,
 };

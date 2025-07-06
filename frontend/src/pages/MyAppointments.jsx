@@ -81,6 +81,8 @@ import { assets } from '../assets/assets'
       }
     };
     const initPay = (order) => {
+      console.log(order); // Make sure you see order.id, order.amount, etc.
+
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
@@ -88,7 +90,7 @@ import { assets } from '../assets/assets'
         name: "Appointment Payment",
         description: "Appointment Payment",
         order_id: order.id,
-        receipt: order.receipt,
+        // receipt: order.receipt,
         handler: async (response) => {
           console.log(response);
 
