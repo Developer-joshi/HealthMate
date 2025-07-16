@@ -175,6 +175,62 @@ const updateDoctorProfile = async(req,res)=>{
     res.json({ success: false, message: error.message });
   }
 }
+
+// Doctor accepts online meeting
+const acceptOnlineMeeting = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const appointment = await appointmentModel.findById(id);
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
+    // Optional: make sure doctor owns this appointment
+    if (appointment.docId !== req.user.id) {
+      return res.status(403).json({ success: false, message: "Unauthorized doctor" });
+    }
+
+    appointment.onlineStatus = "accepted";
+    appointment.meetingRoomId = `room-${appointment._id}-${Date.now()}`;
+    await appointment.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Online meeting accepted",
+      meetingRoomId: appointment.meetingRoomId,
+    });
+  } catch (error) {
+    console.error("Accept meeting error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Doctor rejects online meeting
+const rejectOnlineMeeting = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const appointment = await appointmentModel.findById(id);
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
+    if (appointment.docId !== req.user.id) {
+      return res.status(403).json({ success: false, message: "Unauthorized doctor" });
+    }
+
+    appointment.onlineStatus = "rejected";
+    appointment.meetingRoomId = null;
+    await appointment.save();
+
+    res.status(200).json({ success: true, message: "Meeting rejected" });
+  } catch (error) {
+    console.error("Reject meeting error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 export {
   changeAvailability,
   doctorList,
@@ -185,4 +241,6 @@ export {
   doctorDashboard,
   doctorProfile,
   updateDoctorProfile,
+  acceptOnlineMeeting,
+  rejectOnlineMeeting,
 };

@@ -3,20 +3,56 @@ import { useContext, useEffect } from "react";
 import { DoctorContext } from "../../context/DoctorContext";
 import { AppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const DoctorAppointments = () => {
   const {
     dToken,
     appointments,
-    getAppointments,cancelAppointment,completeAppointment
+    getAppointments,
+    cancelAppointment,
+    completeAppointment,
   } = useContext(DoctorContext);
-  const { slotDateFormat, calculateAge, currency } = useContext(AppContext);
+
+  const { slotDateFormat, calculateAge, currency, backendUrl } =
+    useContext(AppContext);
 
   useEffect(() => {
     if (dToken) {
       getAppointments();
     }
   }, [dToken]);
+
+  const handleAcceptOnline = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/doctor/appointments/${appointmentId}/accept-online`,
+        {},
+        { headers: { token: dToken } }
+      );
+      toast.success("Meeting accepted");
+      getAppointments();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to accept meeting");
+    }
+  };
+
+  const handleRejectOnline = async (appointmentId) => {
+    try {
+      await axios.post(
+        `${backendUrl}/api/doctor/appointments/${appointmentId}/reject-online`,
+        {},
+        { headers: { token: dToken } }
+      );
+      toast.info("Meeting rejected");
+      getAppointments();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to reject meeting");
+    }
+  };
 
   return (
     <div className="w-full max-w-6xl m-5 ">
@@ -59,10 +95,39 @@ const DoctorAppointments = () => {
               {currency}
               {item.amount}
             </p>
+
+            {/* Action column */}
             {item.cancelled ? (
               <p className="text-red-400 text-xs font-medium">Cancelled</p>
             ) : item.isCompleted ? (
               <p className="text-green-500 text-xs font-medium">Completed</p>
+            ) : item.onlineRequested && item.onlineStatus === "pending" ? (
+              <div className="flex flex-col gap-1 items-center">
+                <button
+                  onClick={() => handleAcceptOnline(item._id)}
+                  className="text-green-600 text-xs border border-green-600 px-2 py-1 rounded hover:bg-green-600 hover:text-white"
+                >
+                  Accept Meet
+                </button>
+                <button
+                  onClick={() => handleRejectOnline(item._id)}
+                  className="text-red-500 text-xs border border-red-500 px-2 py-1 rounded hover:bg-red-500 hover:text-white"
+                >
+                  Reject Meet
+                </button>
+              </div>
+            ) : item.onlineStatus === "accepted" ? (
+              <a
+                href={`/video/${item.meetingRoomId}`}
+                target="_blank"
+                className="text-blue-600 text-xs underline"
+              >
+                Join Meeting
+              </a>
+            ) : item.onlineStatus === "rejected" ? (
+              <p className="text-red-400 text-xs font-medium">
+                Request Rejected
+              </p>
             ) : (
               <div className="flex">
                 <img
