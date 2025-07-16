@@ -125,6 +125,23 @@ const MyAppointments = () => {
     }
   };
 
+  const requestOnlineMeeting = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/user/appointments/${appointmentId}/request-online`,
+        {}, // empty body
+        {
+          headers: { token },
+        }
+      );
+      toast.success("Online meeting request sent");
+      getUserAppointments(); // refresh the list
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to request meeting");
+    }
+  };
+  
   useEffect(() => {
     if (token) {
       getUserAppointments();
@@ -206,6 +223,19 @@ const MyAppointments = () => {
                   Appointment cancelled
                 </button>
               )}
+
+              {item.payment &&
+                !item.cancelled &&
+                !item.isCompleted &&
+                !item.onlineRequested && (
+                  <button
+                    onClick={() => requestOnlineMeeting(item._id)}
+                    className="sm:min-w-48 py-2 border rounded text-blue-500 hover:bg-blue-500 hover:text-white transition-all duration-300"
+                  >
+                    Request Online Meeting
+                  </button>
+                )}
+
             </div>
           </div>
         ))}
