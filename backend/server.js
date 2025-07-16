@@ -164,6 +164,11 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("🔴 A user disconnected");
   });
+
+  socket.on("call-ended", (roomId) => {
+    io.to(roomId).emit("call-ended");
+  });
+
 });
 
 // ✅ Start both HTTP and WebSocket server
