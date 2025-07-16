@@ -1,9 +1,11 @@
-// src/components/VideoRoom.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { DoctorContext } from "../../context/DoctorContext";
 
-const socket = io("http://localhost:4000"); // Backend socket server
+const socket = io("http://localhost:4000");
 
 const VideoRoom = () => {
   const { roomId } = useParams();
@@ -12,6 +14,8 @@ const VideoRoom = () => {
   const remoteVideo = useRef(null);
   const peerConnectionRef = useRef(null);
   const [localStream, setLocalStream] = useState(null);
+
+  const { dToken, backendUrl } = useContext(DoctorContext);
 
   useEffect(() => {
     const init = async () => {
@@ -62,7 +66,7 @@ const VideoRoom = () => {
           try {
             await pc.addIceCandidate(new RTCIceCandidate(candidate));
           } catch (err) {
-            console.error("Error adding received ice candidate", err);
+            console.error("Error adding ICE candidate", err);
           }
         }
       });
@@ -78,18 +82,40 @@ const VideoRoom = () => {
 
     return () => {
       socket.disconnect();
-      if (peerConnectionRef.current) peerConnectionRef.current.close();
+      peerConnectionRef.current?.close();
+      localStream?.getTracks().forEach((track) => track.stop());
     };
   }, [roomId]);
 
-  const handleEndCall = () => {
-    if (localStream) {
-      localStream.getTracks().forEach((track) => track.stop());
+  const handleEndCall = async () => {
+    try {
+      localStream?.getTracks().forEach((track) => track.stop());
+      peerConnectionRef.current?.close();
+
+      const appointmentId = roomId.split("-")[1];
+
+      const { data } = await axios.post(
+        `${backendUrl}/api/doctor/complete-appointment`,
+        { appointmentId, docId: "" }, // docId will be taken from token in backend if needed
+        {
+          headers: {
+            dtoken: dToken,
+          },
+        }
+      );
+
+      socket.emit("call-ended", roomId);
+
+      if (data.success) {
+        toast.success("Call ended. Appointment marked completed.");
+        window.location.href = "doctor/appointments";
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("End call error:", error);
+      toast.error("Failed to end call");
     }
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close();
-    }
-    navigate(-1); // or "/dashboard"
   };
 
   return (
@@ -113,8 +139,8 @@ const VideoRoom = () => {
       </div>
 
       <button
+        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
         onClick={handleEndCall}
-        className="mt-6 px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
       >
         End Call
       </button>

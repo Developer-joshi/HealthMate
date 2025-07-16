@@ -231,6 +231,8 @@ const rejectOnlineMeeting = async (req, res) => {
   }
 };
 
+
+
 export {
   changeAvailability,
   doctorList,
@@ -243,4 +245,5 @@ export {
   updateDoctorProfile,
   acceptOnlineMeeting,
   rejectOnlineMeeting,
+
 };

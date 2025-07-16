@@ -16,8 +16,7 @@ const DoctorAppointments = () => {
     backendUrl,
   } = useContext(DoctorContext);
 
-  const { slotDateFormat, calculateAge, currency,  } =
-    useContext(AppContext);
+  const { slotDateFormat, calculateAge, currency } = useContext(AppContext);
 
   useEffect(() => {
     if (dToken) {
@@ -80,7 +79,7 @@ const DoctorAppointments = () => {
                 src={item.userData.image}
                 className="w-8 rounded-full"
                 alt=""
-              />{" "}
+              />
               <p>{item.userData.name}</p>
             </div>
             <div>
@@ -97,10 +96,9 @@ const DoctorAppointments = () => {
               {item.amount}
             </p>
 
-            {/* Action column */}
             {item.cancelled ? (
               <p className="text-red-400 text-xs font-medium">Cancelled</p>
-            ) : item.isCompleted ? (
+            ) : item.onlineStatus === "completed" || item.isCompleted ? (
               <p className="text-green-500 text-xs font-medium">Completed</p>
             ) : item.onlineRequested && item.onlineStatus === "pending" ? (
               <div className="flex flex-col gap-1 items-center">
@@ -117,13 +115,13 @@ const DoctorAppointments = () => {
                   Reject Meet
                 </button>
               </div>
-            ) : item.onlineStatus === "accepted" ? (
+            ) : item.onlineStatus === "accepted" && !item.isCompleted ? (
               <a
                 href={`/video/${item.meetingRoomId}`}
                 target="_blank"
-                className="text-blue-600 text-xs underline"
+                className="text-white text-xs bg-blue-500 px-2 py-1 rounded hover:bg-blue-600"
               >
-                Join Meeting
+                Join Now
               </a>
             ) : item.onlineStatus === "rejected" ? (
               <p className="text-red-400 text-xs font-medium">

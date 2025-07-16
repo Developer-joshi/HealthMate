@@ -1,9 +1,13 @@
+
 import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { assets } from "../assets/assets";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:4000");
 
 const MyAppointments = () => {
   const { backendUrl, token } = useContext(AppContext);
@@ -26,13 +30,11 @@ const MyAppointments = () => {
     "Dec",
   ];
 
-  // Format slot date: 20_01_2024 => 20 Jan 2024
   const slotDateFormat = (slotDate) => {
     const dateArray = slotDate.split("_");
     return `${dateArray[0]} ${months[Number(dateArray[1])]} ${dateArray[2]}`;
   };
 
-  // Get all appointments
   const getUserAppointments = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/user/appointments", {
@@ -47,7 +49,6 @@ const MyAppointments = () => {
     }
   };
 
-  // Cancel appointment
   const cancelAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.post(
@@ -67,7 +68,6 @@ const MyAppointments = () => {
     }
   };
 
-  // Initialize Razorpay
   const initPay = (order) => {
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -90,7 +90,7 @@ const MyAppointments = () => {
 
           if (data.success) {
             toast.success("Payment Successful");
-            getUserAppointments(); // <- this will refresh the UI
+            getUserAppointments();
             navigate("/my-appointments");
           } else {
             toast.error(data.message);
@@ -106,7 +106,6 @@ const MyAppointments = () => {
     rzp.open();
   };
 
-  // Trigger Razorpay order
   const appointmentRazorpay = async (appointmentId) => {
     try {
       const { data } = await axios.post(
@@ -129,23 +128,32 @@ const MyAppointments = () => {
     try {
       const { data } = await axios.post(
         `${backendUrl}/api/user/appointments/${appointmentId}/request-online`,
-        {}, // empty body
+        {},
         {
           headers: { token },
         }
       );
       toast.success("Online meeting request sent");
-      getUserAppointments(); // refresh the list
+      getUserAppointments();
     } catch (err) {
       console.log(err);
       toast.error("Failed to request meeting");
     }
   };
-  
+
   useEffect(() => {
     if (token) {
       getUserAppointments();
     }
+
+    socket.on("end-call", () => {
+      toast.info("Call ended by doctor");
+      navigate("/my-appointments");
+    });
+
+    return () => {
+      socket.off("end-call");
+    };
   }, [token]);
 
   return (
@@ -160,14 +168,12 @@ const MyAppointments = () => {
             key={index}
             className="grid grid-cols-3 gap-4 items-center py-2 border-b"
           >
-            {/* Doctor Image */}
             <img
               className="w-32 bg-indigo-50"
               src={item.docData.image}
               alt={item.docData.name}
             />
 
-            {/* Doctor Details */}
             <div className="flex-1 text-sm text-zinc-600">
               <p className="text-neutral font-semibold">{item.docData.name}</p>
               <p>{item.docData.speciality}</p>
@@ -182,7 +188,6 @@ const MyAppointments = () => {
               </p>
             </div>
 
-            {/* Actions */}
             <div className="flex flex-col justify-end gap-2">
               {!item.cancelled && !item.payment && !item.isCompleted && (
                 <button
@@ -235,21 +240,23 @@ const MyAppointments = () => {
                     Request Online Meeting
                   </button>
                 )}
-              {item.payment &&
-                item.onlineStatus === "accepted" &&
-                item.meetingRoomId && (
-                  <button
-                    onClick={() => navigate(`/video/${item.meetingRoomId}`)}
-                    className="text-white bg-blue-500 hover:bg-blue-600 sm:min-w-48 py-2 border rounded transition-all duration-300"
-                  >
-                    Join Meeting
-                  </button>
-                )}
               {item.onlineStatus === "rejected" && (
                 <p className="text-red-500 text-sm font-medium">
                   Doctor rejected online meeting
                 </p>
               )}
+
+              {item.payment &&
+                item.onlineStatus === "accepted" &&
+                !item.isCompleted && (
+                  <button
+                    onClick={() => navigate(`/video/${item.meetingRoomId}`)}
+                    className="sm:min-w-48 py-2 border rounded text-white bg-blue-500 hover:bg-blue-600 transition-all duration-300"
+                  >
+                    Join Now
+                  </button>
+                )}
+                
             </div>
           </div>
         ))}

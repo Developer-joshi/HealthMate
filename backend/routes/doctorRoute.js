@@ -33,4 +33,5 @@ doctorRouter.post("/update-profile", authDoctor, updateDoctorProfile);
 
 doctorRouter.post("/appointments/:id/accept-online",authDoctor,acceptOnlineMeeting);
 doctorRouter.post("/appointments/:id/reject-online",authDoctor,rejectOnlineMeeting);
+
 export default doctorRouter;

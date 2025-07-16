@@ -2,8 +2,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
+import { toast } from "react-toastify";
 
-const socket = io("http://localhost:4000"); // Backend socket server
+const socket = io("http://localhost:4000"); // Update if needed
 
 const VideoRoom = () => {
   const { roomId } = useParams();
@@ -53,24 +54,22 @@ const VideoRoom = () => {
         socket.emit("answer", { roomId, answer });
       });
 
-      socket.on("answer", async (answer) => {
-        await pc.setRemoteDescription(new RTCSessionDescription(answer));
-      });
-
       socket.on("ice-candidate", async ({ candidate }) => {
         if (candidate) {
           try {
             await pc.addIceCandidate(new RTCIceCandidate(candidate));
           } catch (err) {
-            console.error("Error adding received ice candidate", err);
+            console.error("Error adding ICE candidate", err);
           }
         }
       });
 
-      socket.on("joined", async () => {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        socket.emit("offer", { roomId, offer });
+      // ✅ Listen for doctor ending the call
+      socket.on("call-ended", () => {
+        stream.getTracks().forEach((track) => track.stop());
+        pc.close();
+        toast.info("Doctor has ended the call");
+        navigate("/my-appointments");
       });
     };
 
@@ -78,19 +77,10 @@ const VideoRoom = () => {
 
     return () => {
       socket.disconnect();
-      if (peerConnectionRef.current) peerConnectionRef.current.close();
+      peerConnectionRef.current?.close();
+      localStream?.getTracks().forEach((track) => track.stop());
     };
   }, [roomId]);
-
-  const handleEndCall = () => {
-    if (localStream) {
-      localStream.getTracks().forEach((track) => track.stop());
-    }
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close();
-    }
-    navigate(-1); // or "/dashboard"
-  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 bg-gray-900 text-white">
@@ -112,12 +102,9 @@ const VideoRoom = () => {
         />
       </div>
 
-      <button
-        onClick={handleEndCall}
-        className="mt-6 px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-      >
-        End Call
-      </button>
+      <p className="text-sm text-gray-400 mt-2">
+        Waiting for doctor to join...
+      </p>
     </div>
   );
 };
