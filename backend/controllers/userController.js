@@ -290,10 +290,40 @@ const verifyRazorpay = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
+// ✅ User requests online meeting after payment
+const requestOnlineMeeting = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const appointment = await appointmentModel.findById(id);
+  
+      if (!appointment) {
+        return res.status(404).json({ success: false, message: "Appointment not found" });
+      }
+  
+      if (!appointment.payment) {
+        return res.status(400).json({ success: false, message: "Payment required to request meeting" });
+      }
+  
+      appointment.onlineRequested = true;
+      appointment.onlineStatus = "pending";
+      await appointment.save();
+  
+      res.status(200).json({ success: true, message: "Online meeting requested" });
+    } catch (error) {
+      console.error("Request meeting error:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  };
 
-
-
-
-
-
-export {registerUser,loginUser , getProfile,updateProfile,bookAppointment,listAppointment,cancelAppointment,paymentRazorpay,verifyRazorpay}
+export {
+  registerUser,
+  loginUser,
+  getProfile,
+  updateProfile,
+  bookAppointment,
+  listAppointment,
+  cancelAppointment,
+  paymentRazorpay,
+  verifyRazorpay,
+  requestOnlineMeeting,
+};

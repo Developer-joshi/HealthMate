@@ -2,6 +2,8 @@ import React, { useContext } from 'react'
 import Login from './pages/Login.jsx'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
+import VideoRoom from "./components/video/VideoRoom.jsx";
+
 import {ToastContainer,toast} from 'react-toastify'
 import {Route,Routes} from 'react-router-dom'
 import 'react-toastify/dist/ReactToastify.css'
@@ -34,9 +36,11 @@ const App = () => {
           <Route path="/add-doctor" element={<AddDoctor />} />
           <Route path="/doctor-list" element={<DoctorsList />} />
           {/* doctor routes */}
-          <Route path="/doctor-dashboard" element={<DoctorDashboard/>} />
+
+          <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
           <Route path="/doctor-appointments" element={<DoctorAppointments />} />
           <Route path="/doctor-profile" element={<DoctorProfile />} />
+          <Route path="/video/:roomId" element={<VideoRoom />} />
         </Routes>
       </div>
     </div>

@@ -13,9 +13,10 @@ const DoctorAppointments = () => {
     getAppointments,
     cancelAppointment,
     completeAppointment,
+    backendUrl,
   } = useContext(DoctorContext);
 
-  const { slotDateFormat, calculateAge, currency, backendUrl } =
+  const { slotDateFormat, calculateAge, currency,  } =
     useContext(AppContext);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const DoctorAppointments = () => {
       const { data } = await axios.post(
         `${backendUrl}/api/doctor/appointments/${appointmentId}/accept-online`,
         {},
-        { headers: { token: dToken } }
+        { headers: { dtoken: dToken } }
       );
       toast.success("Meeting accepted");
       getAppointments();
@@ -44,7 +45,7 @@ const DoctorAppointments = () => {
       await axios.post(
         `${backendUrl}/api/doctor/appointments/${appointmentId}/reject-online`,
         {},
-        { headers: { token: dToken } }
+        { headers: { dtoken: dToken } }
       );
       toast.info("Meeting rejected");
       getAppointments();

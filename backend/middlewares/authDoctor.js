@@ -19,6 +19,7 @@ const authDoctor = async (req, res, next) => {
     console.log("✅ Token decoded:", token_decode);
 
     req.body.docId = token_decode.id;
+    req.user = { id: token_decode.id }; // ✅ Needed for accept/reject controller
     next();
   } catch (error) {
     console.log("❌ Token error:", error.message);

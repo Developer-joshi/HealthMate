@@ -235,7 +235,21 @@ const MyAppointments = () => {
                     Request Online Meeting
                   </button>
                 )}
-
+              {item.payment &&
+                item.onlineStatus === "accepted" &&
+                item.meetingRoomId && (
+                  <button
+                    onClick={() => navigate(`/video/${item.meetingRoomId}`)}
+                    className="text-white bg-blue-500 hover:bg-blue-600 sm:min-w-48 py-2 border rounded transition-all duration-300"
+                  >
+                    Join Meeting
+                  </button>
+                )}
+              {item.onlineStatus === "rejected" && (
+                <p className="text-red-500 text-sm font-medium">
+                  Doctor rejected online meeting
+                </p>
+              )}
             </div>
           </div>
         ))}
