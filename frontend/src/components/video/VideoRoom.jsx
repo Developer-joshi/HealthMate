@@ -4,7 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import { toast } from "react-toastify";
 
-const socket = io("http://localhost:4000"); // Update if needed
+const socket = io(import.meta.env.VITE_BACKEND_URL);
+ // Update if needed
 
 const VideoRoom = () => {
   const { roomId } = useParams();
@@ -104,9 +105,9 @@ useEffect(() => {
         />
       </div>
 
-      <p className="text-sm text-gray-400 mt-2">
+      {/* <p className="text-sm text-gray-400 mt-2">
         Waiting for doctor to join...
-      </p>
+      </p> */}
     </div>
   );
 };
