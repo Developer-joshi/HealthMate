@@ -137,11 +137,7 @@ const DoctorAppointments = () => {
                 />
                 <img
                   onClick={() => {
-                    if (item.payment) {
                       completeAppointment(item._id);
-                    } else {
-                      toast.error("Payment not completed yet.");
-                    }
                   }}
                   className="w-10 cursor-pointer"
                   src={assets.tick_icon}
