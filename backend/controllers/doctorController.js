@@ -95,29 +95,42 @@ const appointmentCancel = async (req, res) => {
     const { docId, appointmentId } = req.body;
 
     const appointmentData = await appointmentModel.findById(appointmentId);
-    if (appointmentData && appointmentData.docId === docId) {
-      // Mark appointment as cancelled
-      await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
-
-      // Free up the slot for this doctor
-      const doctor = await doctorModel.findById(docId);
-      if (doctor) {
-        doctor.slots_booked = doctor.slots_booked.filter(
-          (slot) =>
-            !(slot.date === appointmentData.slotDate && slot.time === appointmentData.slotTime)
-        );
-        await doctor.save();
-      }
-
-      return res.json({ success: true, message: "Appointment Cancelled & Slot Freed" });
-    } else {
+    if (!appointmentData || appointmentData.docId !== docId) {
       return res.json({ success: false, message: "Cancellation failed" });
     }
+
+    // Mark appointment as cancelled
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      cancelled: true,
+    });
+
+    // Free up the slot
+    const doctor = await doctorModel.findById(docId);
+    if (doctor) {
+      const dateKey = appointmentData.slotDate; // e.g., "18_07_2025"
+      const time = appointmentData.slotTime; // e.g., "10:00AM"
+
+      if (doctor.slots_booked[dateKey]) {
+        doctor.slots_booked[dateKey] = doctor.slots_booked[dateKey].filter(
+          (t) => t !== time
+        );
+
+        // If no times left for that date, delete the date entry entirely
+        if (doctor.slots_booked[dateKey].length === 0) {
+          delete doctor.slots_booked[dateKey];
+        }
+
+        await doctor.save();
+      }
+    }
+
+    res.json({ success: true, message: "Appointment Cancelled & Slot Freed" });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
 };
+
 
 //API TO GET DASHBOARD DATA FOR DOCTOR PANEL
 const doctorDashboard = async(req,res)=>{
