@@ -69,33 +69,12 @@ const doctorList = async (req, res) => {
 
 
 //API to mark appointment completed for doctor panel
-const appointmentComplete = async (req,res)=>{
-  try {
-    
-    const {docId , appointmentId} = req.body;
-    const appointmentData =await appointmentModel.findById(appointmentId)
-    if(appointmentData && appointmentData.docId===docId)
-    {
-        await appointmentModel.findByIdAndUpdate(appointmentId , {isCompleted : true});
-        return res.json({success:true,message:'Appointment Completed'})
-    }
-    else
-    {
-      return res.json({success:false,message : 'Mark failed'})
-    }
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  }
-}
-
-// API to cancel appointment completed for doctor panel
 const appointmentCancel = async (req, res) => {
   try {
     const { docId, appointmentId } = req.body;
 
-    const appointmentData = await appointmentModel.findById(appointmentId);
-    if (!appointmentData || appointmentData.docId !== docId) {
+    const appointment = await appointmentModel.findById(appointmentId);
+    if (!appointment || appointment.docId !== docId) {
       return res.json({ success: false, message: "Cancellation failed" });
     }
 
@@ -104,29 +83,31 @@ const appointmentCancel = async (req, res) => {
       cancelled: true,
     });
 
-    // Free up the slot
+    // Free the slot in doctor's slots_booked
     const doctor = await doctorModel.findById(docId);
-    if (doctor) {
-      const dateKey = appointmentData.slotDate; // e.g., "18_07_2025"
-      const time = appointmentData.slotTime; // e.g., "10:00AM"
+    if (doctor && doctor.slots_booked) {
+      const { slotDate, slotTime } = appointment;
 
-      if (doctor.slots_booked[dateKey]) {
-        doctor.slots_booked[dateKey] = doctor.slots_booked[dateKey].filter(
-          (t) => t !== time
+      if (doctor.slots_booked[slotDate]) {
+        doctor.slots_booked[slotDate] = doctor.slots_booked[slotDate].filter(
+          (time) => time !== slotTime
         );
 
-        // If no times left for that date, delete the date entry entirely
-        if (doctor.slots_booked[dateKey].length === 0) {
-          delete doctor.slots_booked[dateKey];
+        // If no slots left for that day, delete the date key
+        if (doctor.slots_booked[slotDate].length === 0) {
+          delete doctor.slots_booked[slotDate];
         }
 
         await doctor.save();
       }
     }
 
-    res.json({ success: true, message: "Appointment Cancelled & Slot Freed" });
+    return res.json({
+      success: true,
+      message: "Appointment cancelled, slot reopened",
+    });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: error.message });
   }
 };
