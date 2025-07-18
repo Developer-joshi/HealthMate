@@ -108,7 +108,7 @@ const VideoRoom = () => {
 
       if (data.success) {
         toast.success("Call ended. Appointment marked completed.");
-        window.location.href = "doctor/appointments";
+        navigate("/doctor-appointments");
       } else {
         toast.error(data.message);
       }

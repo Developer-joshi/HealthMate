@@ -116,13 +116,21 @@ const DoctorAppointments = () => {
                 </button>
               </div>
             ) : item.onlineStatus === "accepted" && !item.isCompleted ? (
-              <a
-                href={`/video/${item.meetingRoomId}`}
-                target="_blank"
+              // <a
+              //   href={`/video/${item.meetingRoomId}`}
+              //   target="_blank"
+              //   className="text-white text-xs bg-blue-500 px-2 py-1 rounded hover:bg-blue-600"
+              // >
+              //   Join Now
+              // </a>
+              <button
+                onClick={() =>
+                  (window.location.href = `/video/${item.meetingRoomId}`)
+                }
                 className="text-white text-xs bg-blue-500 px-2 py-1 rounded hover:bg-blue-600"
               >
                 Join Now
-              </a>
+              </button>
             ) : item.onlineStatus === "rejected" ? (
               <p className="text-red-400 text-xs font-medium">
                 Request Rejected
@@ -137,7 +145,7 @@ const DoctorAppointments = () => {
                 />
                 <img
                   onClick={() => {
-                      completeAppointment(item._id);
+                    completeAppointment(item._id);
                   }}
                   className="w-10 cursor-pointer"
                   src={assets.tick_icon}

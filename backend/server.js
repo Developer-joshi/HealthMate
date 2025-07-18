@@ -19,7 +19,10 @@ const port = process.env.PORT || 4000;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // change this to your frontend URL in prod
+    origin: [
+      "https://health-mate-gold.vercel.app/",
+      "health-mate-admin.vercel.app",
+    ], // change this to your frontend URL in prod
     methods: ["GET", "POST"],
   },
 });
