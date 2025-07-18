@@ -5,7 +5,6 @@ import io from "socket.io-client";
 import { toast } from "react-toastify";
 
 const socket = io(import.meta.env.VITE_BACKEND_URL);
- // Update if needed
 
 const VideoRoom = () => {
   const { roomId } = useParams();
@@ -15,75 +14,77 @@ const VideoRoom = () => {
   const peerConnectionRef = useRef(null);
   const [localStream, setLocalStream] = useState(null);
 
-useEffect(() => {
-  const pc = new RTCPeerConnection({
-    iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-  });
-  peerConnectionRef.current = pc;
-
-  const init = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
+  useEffect(() => {
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
+    peerConnectionRef.current = pc;
 
-    localVideo.current.srcObject = stream;
-    setLocalStream(stream);
+    const init = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
 
-    socket.emit("join-room", roomId);
+      localVideo.current.srcObject = stream;
+      setLocalStream(stream);
 
-    // ✅ Listen for doctor ending the call right here inside init
-    socket.on("call-ended", () => {
-      stream.getTracks().forEach((track) => track.stop());
-      pc.close();
-      toast.info("Doctor has ended the call");
-      navigate("/my-appointments");
-    });
+      socket.emit("join-room", roomId);
 
-    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+      // ✅ Handle doctor ending the call
+      socket.on("call-ended", () => {
+        stream.getTracks().forEach((track) => track.stop());
+        pc.close();
+        toast.info("Doctor has ended the call");
+        navigate("/my-appointments");
+      });
 
-    pc.ontrack = (event) => {
-      remoteVideo.current.srcObject = event.streams[0];
-    };
+      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        socket.emit("ice-candidate", {
-          roomId,
-          candidate: event.candidate,
-        });
-      }
-    };
+      pc.ontrack = (event) => {
+        remoteVideo.current.srcObject = event.streams[0];
+      };
 
-    socket.on("offer", async (offer) => {
-      await pc.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      socket.emit("answer", { roomId, answer });
-    });
-
-    socket.on("ice-candidate", async ({ candidate }) => {
-      if (candidate) {
-        try {
-          await pc.addIceCandidate(new RTCIceCandidate(candidate));
-        } catch (err) {
-          console.error("Error adding received ice candidate", err);
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit("ice-candidate", { roomId, candidate: event.candidate });
         }
-      }
-    });
-  };
+      };
 
-  init();
+      // Handle offer (doctor initiates)
+      socket.on("offer", async (offer) => {
+        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        socket.emit("answer", { roomId, answer });
+      });
 
-  return () => {
-    // ✅ Proper cleanup here
-    socket.off("call-ended");
-    socket.disconnect();
-    peerConnectionRef.current?.close();
-    localStream?.getTracks().forEach((track) => track.stop());
-  };
-}, [roomId]);
+      // Handle answer (in case user initiates)
+      socket.on("answer", async (answer) => {
+        await pc.setRemoteDescription(new RTCSessionDescription(answer));
+      });
 
+      socket.on("ice-candidate", async ({ candidate }) => {
+        if (candidate) {
+          try {
+            await pc.addIceCandidate(new RTCIceCandidate(candidate));
+          } catch (err) {
+            console.error("Error adding ICE candidate", err);
+          }
+        }
+      });
+    };
+
+    init();
+
+    // Cleanup when user leaves or component unmounts
+    return () => {
+      socket.off("call-ended");
+      socket.disconnect();
+      peerConnectionRef.current?.close();
+      localStream?.getTracks().forEach((track) => track.stop());
+    };
+  }, [roomId]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 bg-gray-900 text-white">
@@ -104,10 +105,6 @@ useEffect(() => {
           className="w-64 h-48 rounded"
         />
       </div>
-
-      {/* <p className="text-sm text-gray-400 mt-2">
-        Waiting for doctor to join...
-      </p> */}
     </div>
   );
 };
