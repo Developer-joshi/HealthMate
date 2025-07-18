@@ -1,4 +1,4 @@
-// src/components/VideoRoom.jsx
+// // src/components/VideoRoom.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import io from "socket.io-client";

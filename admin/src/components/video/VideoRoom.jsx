@@ -29,6 +29,8 @@ const VideoRoom = () => {
 
       socket.emit("join-room", roomId);
 
+
+
       const pc = new RTCPeerConnection({
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
       });
@@ -36,6 +38,9 @@ const VideoRoom = () => {
       peerConnectionRef.current = pc;
 
       stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+      pc.onconnectionstatechange = () => {
+        console.log("Doctor connection state:", pc.connectionState);
+      };
 
       pc.ontrack = (event) => {
         remoteVideo.current.srcObject = event.streams[0];
