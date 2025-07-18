@@ -89,26 +89,35 @@ const appointmentComplete = async (req,res)=>{
   }
 }
 
-//API to cancel appointment completed for doctor panel
-const appointmentCancel = async (req,res)=>{
+// API to cancel appointment completed for doctor panel
+const appointmentCancel = async (req, res) => {
   try {
-    
-    const {docId , appointmentId} = req.body;
-    const appointmentData =await appointmentModel.findById(appointmentId)
-    if(appointmentData && appointmentData.docId===docId)
-    {
-        await appointmentModel.findByIdAndUpdate(appointmentId , {cancelled : true});
-        return res.json({success:true,message:'Appointment Cancelled'})
-    }
-    else
-    {
-      return res.json({success:false,message : 'Cancellation failed'})
+    const { docId, appointmentId } = req.body;
+
+    const appointmentData = await appointmentModel.findById(appointmentId);
+    if (appointmentData && appointmentData.docId === docId) {
+      // Mark appointment as cancelled
+      await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
+
+      // Free up the slot for this doctor
+      const doctor = await doctorModel.findById(docId);
+      if (doctor) {
+        doctor.slots_booked = doctor.slots_booked.filter(
+          (slot) =>
+            !(slot.date === appointmentData.slotDate && slot.time === appointmentData.slotTime)
+        );
+        await doctor.save();
+      }
+
+      return res.json({ success: true, message: "Appointment Cancelled & Slot Freed" });
+    } else {
+      return res.json({ success: false, message: "Cancellation failed" });
     }
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
-}
+};
 
 //API TO GET DASHBOARD DATA FOR DOCTOR PANEL
 const doctorDashboard = async(req,res)=>{
