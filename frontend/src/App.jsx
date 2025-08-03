@@ -11,7 +11,7 @@ import Appointment from './pages/Appointment';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import VideoRoom from './components/video/VideoRoom.jsx';
-import {ToastContainer,toast} from 'react-toastify'
+import {ToastContainer} from 'react-toastify'
 import 'react-toastify/ReactToastify.css'
 
 const App = () => {
